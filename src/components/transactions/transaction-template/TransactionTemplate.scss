@@ -1,0 +1,32 @@
+.transaction-template{
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  align-items: flex-start;
+  height: 250px;
+  width: 250px;
+
+  input{
+    border: none;
+    border-bottom: 1px solid;
+    margin-bottom: 15px;
+    width: 100%;
+  }
+
+  .chose-costumer{
+    margin-right: 10px;
+  }
+
+  .save-btn{
+    align-self: flex-end;
+    cursor: pointer;
+    background: #8181e7;
+    width: 100px;
+    text-align: center;
+    border-radius: 10px;
+    padding: 6px 10px;
+    color: white;
+    margin-bottom: 20px;
+    margin-top: auto;
+  }
+}

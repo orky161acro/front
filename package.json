@@ -6,9 +6,10 @@
   "license": "UNLICENSED",
   "scripts": {
     "start": "webpack-dev-server --hot --inline --color --config webpack.config.dev.js",
-    "build-dev": "webpack --config webpack.config.build.js"
+    "build": "webpack --config webpack.config.build.js"
   },
   "dependencies": {
+    "@material-ui/core": "^4.11.3",
     "@types/ua-parser-js": "^0.7.33",
     "axios": "^0.18.1",
     "react": "^16.8.3",

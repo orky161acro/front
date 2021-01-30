@@ -22,12 +22,14 @@ module.exports = {
         'prettier'
     ],
     "rules": {
-        "react/jsx-max-props-per-line": [2, {"maximum": 1, "when": "always" }],
+        "react/jsx-max-props-per-line": [2, {"maximum": 10, "when": "always" }],
         "react/jsx-first-prop-new-line": [2, "never"],
         "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-empty-interface": "off",
         "prettier/prettier": "error",
-        "@typescript-eslint/no-var-requires": "off"
+        "@typescript-eslint/no-var-requires": "off",
+        "@typescript-eslint/camelcase": "off",
+        "@typescript-eslint/interface-name-prefix": "off"
     }
 };

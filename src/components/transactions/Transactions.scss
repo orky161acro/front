@@ -1,0 +1,18 @@
+.transactions-page{
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  align-items: center;
+
+  .add-transaction{
+    align-self: flex-end;
+    cursor: pointer;
+    background: #8181e7;
+    width: 150px;
+    text-align: center;
+    border-radius: 10px;
+    padding: 6px 10px;
+    color: white;
+    margin-bottom: 20px;
+  }
+}
