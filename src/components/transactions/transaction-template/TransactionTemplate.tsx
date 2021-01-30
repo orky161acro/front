@@ -19,7 +19,6 @@ export const TransactionTemplate = React.memo(
       credit_card_number: props?.transaction?.credit_card_number || '',
       customer: props?.transaction?.customer || props.customers[0].id
     });
-    console.log(props.transaction)
     const updateForm = useCallback(e => {
         const { value, name } = e.target;
         setTransactionForm(prevState => ({ ...prevState, [name]: value }));
@@ -27,6 +26,7 @@ export const TransactionTemplate = React.memo(
 
     const handleSave = useCallback(() =>{
         props.onSave(transactionForm)
+        props.onClose()
     },[transactionForm]);
 
     return (

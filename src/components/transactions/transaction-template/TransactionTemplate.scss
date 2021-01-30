@@ -11,6 +11,9 @@
     border-bottom: 1px solid;
     margin-bottom: 15px;
     width: 100%;
+    &:focus{
+      outline: none;
+    }
   }
 
   .chose-customer{

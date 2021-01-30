@@ -12,11 +12,14 @@ import { TransactionTemplate } from './transaction-template/TransactionTemplate'
 import {
   createTransactionService,
   deleteTransactionService,
-  fetchTransactionsService, updateTransactionService
+  fetchTransactionsService,
+  updateTransactionService
 } from '../../services/transactions';
+import { TransactionRow } from './transaction_row/TransactionRow';
 
 interface ITransactionsProps {
-  customers
+  customers;
+  handleLoading;
 }
 
 export const Transactions = React.memo((props: ITransactionsProps) => {
@@ -28,47 +31,36 @@ export const Transactions = React.memo((props: ITransactionsProps) => {
   }, [transactionTemplateMode]);
 
   useEffect(() => {
-    fetchTransactionsService()
-      .then(res => {
-        setTransactions(res.data.transactions);
-      })
-      .catch(() => {
-        alert('adding fail');
-      });
+    props.handleLoading(fetchTransactionsService, 'Fetch fail').then(res => setTransactions(res.data.transactions));
   }, []);
 
   const handleAddTransaction = useCallback(async transaction => {
-      try {
-        const res = await createTransactionService(transaction);
-        setTransactions(prevState => prevState.concat(res.data.transaction));
-      } catch {
-        alert('adding fail');
-      }
+      const res = await props.handleLoading(() => createTransactionService(transaction), 'Adding fail');
+      console.log(res)
+      setTransactions(prevState => prevState.concat(res.data.transaction));
     }, [transactions]);
 
   const handleDeleteTransaction = useCallback(async id => {
-      try {
-        await deleteTransactionService(id);
-        setTransactions(prevState => prevState.filter(tr => tr.id !== id));
-      } catch {
-        alert('deleting fail');
-      }}, [transactions]);
-
-  const handleUpdateTransaction = useCallback( (id) => async (transaction) => {
-      try {
-        await updateTransactionService(id, transaction);
-        setTransactions(prevState => prevState.map(tr => tr.id !== id ? tr : transaction));
-      } catch {
-        alert('update fail');
-      }
+      await props.handleLoading(() => deleteTransactionService(id), 'Deleting fail');
+      setTransactions(prevState => prevState.filter(tr => tr.id !== id));
     }, [transactions]);
 
+  const handleUpdateTransaction = useCallback(id => async transaction => {
+      await props.handleLoading(() => updateTransactionService(id, transaction), 'Deleting fail');
+      setTransactions(prevState => prevState.map(tr => (tr.id !== id ? tr : transaction)));
+    }, [transactions]);
 
   return (
     <div className="transactions-page">
-      <div onClick={handleTemplateMode} className="add-transaction">Add Transaction</div>
-      {transactionTemplateMode &&
-      <TransactionTemplate customers={props.customers} onSave={handleAddTransaction} onClose={handleTemplateMode} />}
+      <div onClick={handleTemplateMode} className="add-transaction">
+        Add Transaction
+      </div>
+      {transactionTemplateMode && (
+        <TransactionTemplate customers={props.customers}
+          onSave={handleAddTransaction}
+          onClose={handleTemplateMode}
+        />
+      )}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -81,38 +73,17 @@ export const Transactions = React.memo((props: ITransactionsProps) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {transactions.map(transaction => <TransactionRow customers={props.customers}
-                                                             onUpdate={handleUpdateTransaction}
-                                                             onDelete={handleDeleteTransaction}
-                                                             transaction={transaction} key={transaction.id} />)}
+            {transactions.map(transaction => (
+              <TransactionRow customers={props.customers}
+                onUpdate={handleUpdateTransaction}
+                onDelete={handleDeleteTransaction}
+                transaction={transaction}
+                key={transaction.id}
+              />
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
     </div>
-  );
-});
-
-const TransactionRow = React.memo((props: { transaction, onDelete, customers, onUpdate }) => {
-  const [transactionUpdateMode, setTransactionUpdateMode] = useState(false);
-
-  const handleTemplateMode = useCallback(() => {
-    setTransactionUpdateMode(prevState => !prevState);
-  }, [transactionUpdateMode]);
-
-
-  const { transaction, onDelete, onUpdate } = props;
-  return (
-    <TableRow>
-      <TableCell component="th" scope="row">
-        {transaction.product}
-      </TableCell>
-      <TableCell align="right">{`${transaction.total_price} ${transaction.currency}`}</TableCell>
-      <TableCell align="right">{transaction.credit_card_number ? transaction.credit_card_number % 10000 : '****'}</TableCell>
-      <TableCell align="right">{transaction.first_name}</TableCell>
-      <TableCell align="right">{transaction.phone}</TableCell>
-      <TableCell onClick={handleTemplateMode} className='update' align="right">Update</TableCell>
-      <TableCell onClick={() => onDelete(transaction.id)} className='delete' align="right">Delete</TableCell>
-      {transactionUpdateMode && <TransactionTemplate transaction={transaction} customers={props.customers} onSave={onUpdate(transaction.id)} onClose={handleTemplateMode} />}
-    </TableRow>
   );
 });
