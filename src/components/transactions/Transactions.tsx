@@ -9,7 +9,11 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import './Transactions.scss';
 import { TransactionTemplate } from './transaction-template/TransactionTemplate';
-import { createTransactionService, fetchTransactionsService } from '../../services/transactions';
+import {
+  createTransactionService,
+  deleteTransactionService,
+  fetchTransactionsService, updateTransactionService
+} from '../../services/transactions';
 
 interface ITransactionsProps {
   customers
@@ -34,18 +38,37 @@ export const Transactions = React.memo((props: ITransactionsProps) => {
   }, []);
 
   const handleAddTransaction = useCallback(async transaction => {
-    try {
-      const res = await createTransactionService(transaction);
-      setTransactions(prevState => prevState.concat(res.data.transaction));
-    } catch {
-      alert('adding fail');
-    }
-  }, []);
+      try {
+        const res = await createTransactionService(transaction);
+        setTransactions(prevState => prevState.concat(res.data.transaction));
+      } catch {
+        alert('adding fail');
+      }
+    }, [transactions]);
+
+  const handleDeleteTransaction = useCallback(async id => {
+      try {
+        await deleteTransactionService(id);
+        setTransactions(prevState => prevState.filter(tr => tr.id !== id));
+      } catch {
+        alert('deleting fail');
+      }}, [transactions]);
+
+  const handleUpdateTransaction = useCallback( (id) => async (transaction) => {
+      try {
+        await updateTransactionService(id, transaction);
+        setTransactions(prevState => prevState.map(tr => tr.id !== id ? tr : transaction));
+      } catch {
+        alert('update fail');
+      }
+    }, [transactions]);
+
 
   return (
     <div className="transactions-page">
       <div onClick={handleTemplateMode} className="add-transaction">Add Transaction</div>
-      {transactionTemplateMode && <TransactionTemplate costumers={props.customers} onSave={handleAddTransaction} onClose={handleTemplateMode} />}
+      {transactionTemplateMode &&
+      <TransactionTemplate customers={props.customers} onSave={handleAddTransaction} onClose={handleTemplateMode} />}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -57,27 +80,39 @@ export const Transactions = React.memo((props: ITransactionsProps) => {
               <TableCell align="right">Customer Phone</TableCell>
             </TableRow>
           </TableHead>
-          <TransactionsBody transitions={transactions} />
+          <TableBody>
+            {transactions.map(transaction => <TransactionRow customers={props.customers}
+                                                             onUpdate={handleUpdateTransaction}
+                                                             onDelete={handleDeleteTransaction}
+                                                             transaction={transaction} key={transaction.id} />)}
+          </TableBody>
         </Table>
       </TableContainer>
     </div>
   );
 });
 
-const TransactionsBody = React.memo((props: { transitions }) => {
+const TransactionRow = React.memo((props: { transaction, onDelete, customers, onUpdate }) => {
+  const [transactionUpdateMode, setTransactionUpdateMode] = useState(false);
+
+  const handleTemplateMode = useCallback(() => {
+    setTransactionUpdateMode(prevState => !prevState);
+  }, [transactionUpdateMode]);
+
+
+  const { transaction, onDelete, onUpdate } = props;
   return (
-    <TableBody>
-      {props.transitions.map(row => (
-        <TableRow key={row.id}>
-          <TableCell component="th" scope="row">
-            {row.product}
-          </TableCell>
-          <TableCell align="right">{`${row.total_price} ${row.currency}`}</TableCell>
-          <TableCell align="right">{row.credit_card_number ? row.credit_card_number % 10000 : "****"}</TableCell>
-          <TableCell align="right">{row.first_name}</TableCell>
-          <TableCell align="right">{row.phone}</TableCell>
-        </TableRow>
-      ))}
-    </TableBody>
+    <TableRow>
+      <TableCell component="th" scope="row">
+        {transaction.product}
+      </TableCell>
+      <TableCell align="right">{`${transaction.total_price} ${transaction.currency}`}</TableCell>
+      <TableCell align="right">{transaction.credit_card_number ? transaction.credit_card_number % 10000 : '****'}</TableCell>
+      <TableCell align="right">{transaction.first_name}</TableCell>
+      <TableCell align="right">{transaction.phone}</TableCell>
+      <TableCell onClick={handleTemplateMode} className='update' align="right">Update</TableCell>
+      <TableCell onClick={() => onDelete(transaction.id)} className='delete' align="right">Delete</TableCell>
+      {transactionUpdateMode && <TransactionTemplate transaction={transaction} customers={props.customers} onSave={onUpdate(transaction.id)} onClose={handleTemplateMode} />}
+    </TableRow>
   );
 });
