@@ -1,8 +1,8 @@
 #vars
-tag=0
+tag=1
 REPO=orky161
 ORGANIZATION=acro
-PROJECT=front
+PROJECT=frontend
 IMAGE=${REPO}/${ORGANIZATION}-${PROJECT}:${tag}
 
 build:
