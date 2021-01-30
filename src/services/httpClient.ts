@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Promise } from 'bluebird';
 
 const client = axios.create({
-  baseURL: 'http://localhost:8080'
+  baseURL: process.env.SERVER_URL || 'http://localhost:8080'
 });
 
 client.interceptors.request.use(
