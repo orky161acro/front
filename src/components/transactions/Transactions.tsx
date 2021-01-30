@@ -36,7 +36,9 @@ export const Transactions = React.memo((props: ITransactionsProps) => {
 
   const handleAddTransaction = useCallback(async transaction => {
       const res = await props.handleLoading(() => createTransactionService(transaction), 'Adding fail');
-      if (res) setTransactions(prevState => prevState.concat(res.data.transaction));
+      const customer = props.customers.find(c => c.id === transaction.customer);
+      console.log(customer)
+      if (res) setTransactions(prevState => prevState.concat({ ...res.data.transaction, ...customer }));
     }, [transactions]);
 
   const handleDeleteTransaction = useCallback(async id => {
@@ -44,9 +46,10 @@ export const Transactions = React.memo((props: ITransactionsProps) => {
       setTransactions(prevState => prevState.filter(tr => tr.id !== id));
     }, [transactions]);
 
-  const handleUpdateTransaction = useCallback(id => async transaction => {
-      await props.handleLoading(() => updateTransactionService(id, transaction), 'Deleting fail');
-      setTransactions(prevState => prevState.map(tr => (tr.id !== id ? tr : transaction)));
+  const handleUpdateTransaction = useCallback(transactionId => async transaction => {
+      await props.handleLoading(() => updateTransactionService(transactionId, transaction), 'Updating fail');
+      const { first_name, phone, id } = props.customers.find(c => c.id === transaction.customer);
+      setTransactions(prevState => prevState.map(tr => (tr.id !== transactionId ? tr : { ...transaction, first_name, phone ,customer: id })));
     }, [transactions]);
 
   return (

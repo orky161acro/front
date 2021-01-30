@@ -17,6 +17,7 @@ export const TransactionTemplate = React.memo(
       total_price: props?.transaction?.total_price || '',
       currency: props?.transaction?.currency || '',
       credit_card_number: props?.transaction?.credit_card_number || '',
+      credit_card_type: props?.transaction?.credit_card_type || '',
       customer: props?.transaction?.customer || props.customers[0].id
     });
     const updateForm = useCallback(e => {
@@ -36,6 +37,7 @@ export const TransactionTemplate = React.memo(
           <input value={transactionForm.total_price} name={'total_price'} onChange={updateForm} placeholder={'Price'} />
           <input value={transactionForm.currency} name={'currency'} onChange={updateForm} placeholder={'Currency'} />
           <input value={transactionForm.credit_card_number} name={'credit_card_number'} onChange={updateForm} placeholder={'CC'} />
+          <input value={transactionForm.credit_card_type} name={'credit_card_type'} onChange={updateForm} placeholder={'CC type'} />
           <div>
             <span className='chose-customer'>Chose customer</span>
             <select value={transactionForm.customer} onChange={updateForm} name="customer">
