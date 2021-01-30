@@ -24,8 +24,8 @@ export const TransactionTemplate = React.memo(
         setTransactionForm(prevState => ({ ...prevState, [name]: value }));
       }, [transactionForm]);
 
-    const handleSave = useCallback(() =>{
-        props.onSave(transactionForm)
+    const handleSave = useCallback(() => {
+        props.onSave({ ...transactionForm, total_price: parseFloat(transactionForm.total_price), credit_card_number: parseInt(transactionForm.credit_card_number) })
         props.onClose()
     },[transactionForm]);
 

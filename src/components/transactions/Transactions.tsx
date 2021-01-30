@@ -31,13 +31,12 @@ export const Transactions = React.memo((props: ITransactionsProps) => {
   }, [transactionTemplateMode]);
 
   useEffect(() => {
-    props.handleLoading(fetchTransactionsService, 'Fetch fail').then(res => setTransactions(res.data.transactions));
+    props.handleLoading(fetchTransactionsService, 'Fetch fail').then(res => setTransactions(res?.data?.transactions || []));
   }, []);
 
   const handleAddTransaction = useCallback(async transaction => {
       const res = await props.handleLoading(() => createTransactionService(transaction), 'Adding fail');
-      console.log(res)
-      setTransactions(prevState => prevState.concat(res.data.transaction));
+      if (res) setTransactions(prevState => prevState.concat(res.data.transaction));
     }, [transactions]);
 
   const handleDeleteTransaction = useCallback(async id => {
