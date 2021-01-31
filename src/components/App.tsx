@@ -18,13 +18,12 @@ export class App extends React.Component<{}, AppState> {
   }
 
   async componentDidMount() {
-    try {
-      const res = await fetchCustomersService();
+    const res = await this.handleLoading(fetchCustomersService, 'fetch customers failed')
+    if (res) {
       this.setState({ customers: res.data.customers });
-    } catch {
-      alert('fetch customers failed');
     }
   }
+
   handleLoading = async (cb, failedMsg) => {
     this.setState({ loading: true });
     try {
