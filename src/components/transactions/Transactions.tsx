@@ -26,18 +26,17 @@ export const Transactions = React.memo((props: ITransactionsProps) => {
   const [transactions, setTransactions] = useState([]);
   const [transactionTemplateMode, setTransactionTemplateMode] = useState(false);
 
-  const handleTemplateMode = useCallback(() => {
-    setTransactionTemplateMode(prevState => !prevState);
-  }, [transactionTemplateMode]);
-
   useEffect(() => {
     props.handleLoading(fetchTransactionsService, 'Fetch fail').then(res => setTransactions(res?.data?.transactions || []));
   }, []);
 
+  const handleTemplateMode = useCallback(() => {
+    setTransactionTemplateMode(prevState => !prevState);
+  }, [transactionTemplateMode]);
+
   const handleAddTransaction = useCallback(async transaction => {
       const res = await props.handleLoading(() => createTransactionService(transaction), 'Adding fail');
       const customer = props.customers.find(c => c.id === transaction.customer);
-      console.log(customer)
       if (res) setTransactions(prevState => prevState.concat({ ...res.data.transaction, ...customer }));
     }, [transactions]);
 
